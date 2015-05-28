@@ -19,7 +19,7 @@ test( 'convert invalid format', function (t) {
     var buffer;
     try {
         buffer = imagemagick.convert({
-            srcData: require('fs').readFileSync( "test.png" ), // 58x66
+            srcData: require('fs').readFileSync( "./test/test.png" ), // 58x66
             width: 100,
             height: 100,
             quality: 80,
@@ -50,7 +50,7 @@ test( 'convert invalid resizeStyle', function (t) {
     var buffer;
     try {
         buffer = imagemagick.convert({
-            srcData: require('fs').readFileSync( "test.png" ), // 58x66
+            srcData: require('fs').readFileSync( "./test/test.png" ), // 58x66
             width: 100,
             height: 100,
             resizeStyle: "fit", // not defined
@@ -69,7 +69,7 @@ test( 'convert srcData is a Buffer', function (t) {
     var buffer;
     try {
         imagemagick.convert({
-            srcData: require('fs').readFileSync( "test.png", 'binary' ),
+            srcData: require('fs').readFileSync( "./test/test.png", 'binary' ),
             width: 100,
             height: 100,
             resizeStyle: "fit", // not defined
@@ -88,7 +88,7 @@ test( 'convert filter not supported', function (t) {
     var buffer;
     try {
         imagemagick.convert({
-            srcData: require('fs').readFileSync( "test.png" ),
+            srcData: require('fs').readFileSync( "./test/test.png" ),
             width: 100,
             height: 100,
             quality: 80,
@@ -105,7 +105,7 @@ test( 'convert filter not supported', function (t) {
 
 test( 'convert filter Lagrange', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.png" ), // 58x66
+        srcData: require('fs').readFileSync( "./test/test.png" ), // 58x66
         width: 100,
         height: 100,
         filter: 'Lagrange',
@@ -120,7 +120,7 @@ test( 'convert filter Lagrange', function (t) {
 
 test( 'convert blur', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.png" ), // 58x66
+        srcData: require('fs').readFileSync( "./test/test.png" ), // 58x66
         width: 100,
         height: 100,
         quality: 80,
@@ -135,7 +135,7 @@ test( 'convert blur', function (t) {
 
 test( 'convert strip', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.png" ),
+        srcData: require('fs').readFileSync( "./test/test.png" ),
         width: 100,
         height: 100,
         quality: 80,
@@ -150,7 +150,7 @@ test( 'convert strip', function (t) {
 
 test( 'convert png -> png aspectfill', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.png" ), // 58x66
+        srcData: require('fs').readFileSync( "./test/test.png" ), // 58x66
         width: 100,
         height: 100,
         resizeStyle: 'aspectfill', // default.
@@ -166,7 +166,7 @@ test( 'convert png -> png aspectfill', function (t) {
 
 test( 'convert png -> jpg aspectfill', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.png" ),
+        srcData: require('fs').readFileSync( "./test/test.png" ),
         width: 100,
         height: 100,
         quality: 80,
@@ -181,7 +181,7 @@ test( 'convert png -> jpg aspectfill', function (t) {
 
 test( 'convert png.wide -> png.wide aspectfill', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.wide.png" ),
+        srcData: require('fs').readFileSync( "./test/test.wide.png" ),
         width: 100,
         height: 100,
         quality: 80,
@@ -196,7 +196,7 @@ test( 'convert png.wide -> png.wide aspectfill', function (t) {
 
 test( 'convert jpg -> jpg fill', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.jpg" ),
+        srcData: require('fs').readFileSync( "./test/test.jpg" ),
         width: 100,
         height: 100,
         resizeStyle: "fill",
@@ -212,7 +212,7 @@ test( 'convert jpg -> jpg fill', function (t) {
 
 test( 'convert jpg -> jpg aspectfit', function (t) {
     var buffer = imagemagick.convert({
-        srcData: require('fs').readFileSync( "test.jpg" ),
+        srcData: require('fs').readFileSync( "./test/test.jpg" ),
         width: 100,
         height: 100,
         resizeStyle: "aspectfit",
@@ -227,7 +227,7 @@ test( 'convert jpg -> jpg aspectfit', function (t) {
 });
 
 test( 'convert broken png', function (t) {
-    var srcData = require('fs').readFileSync( "broken.png" )
+    var srcData = require('fs').readFileSync( "./test/broken.png" )
     , buffer;
 
     try {
@@ -278,7 +278,7 @@ test( 'convert broken png', function (t) {
 
 test( 'convert to rotate 90 degrees', function (t) {
   var buffer = imagemagick.convert({
-    srcData: require('fs').readFileSync( "test.jpg" ),
+    srcData: require('fs').readFileSync( "./test/test.jpg" ),
     rotate: 90,
     debug: debug
   });
@@ -291,7 +291,7 @@ test( 'convert to rotate 90 degrees', function (t) {
 
 test( 'convert to rotate -90 degrees', function (t) {
   var buffer = imagemagick.convert({
-    srcData: require('fs').readFileSync( "test.jpg" ),
+    srcData: require('fs').readFileSync( "./test/test.jpg" ),
     rotate: -90,
     debug: debug
   });
@@ -319,7 +319,7 @@ test( 'identify srcData is a Buffer', function (t) {
     var buffer;
     try {
         buffer = imagemagick.identify({
-            srcData: require('fs').readFileSync( "test.png", 'binary' )
+            srcData: require('fs').readFileSync( "./test/test.png", 'binary' )
         });
     } catch (e) {
         t.equal( e.message, "identify()'s 1st argument should have \"srcData\" key with a Buffer instance" );
@@ -330,7 +330,7 @@ test( 'identify srcData is a Buffer', function (t) {
 
 test( 'identify results', function (t) {
     var info = imagemagick.identify({
-        srcData: require('fs').readFileSync( "test.png" )
+        srcData: require('fs').readFileSync( "./test/test.png" )
     });
     t.equal( info.width, 58, 'width is 58' );
     t.equal( info.height, 66, 'height is 66' );
@@ -357,7 +357,7 @@ test( 'quantizeColors srcData is a Buffer', function (t) {
     var buffer;
     try {
         buffer = imagemagick.quantizeColors({
-            srcData: require('fs').readFileSync( "test.png", 'binary' )
+            srcData: require('fs').readFileSync( "./test/test.png", 'binary' )
         });
     } catch (e) {
         t.equal( e.message, "quantizeColors()'s 1st argument should have \"srcData\" key with a Buffer instance" );
@@ -368,7 +368,7 @@ test( 'quantizeColors srcData is a Buffer', function (t) {
 
 test( 'quantizeColors results, 1 color', function (t) {
     var results = imagemagick.quantizeColors({
-        srcData: require('fs').readFileSync( "test.quantizeColors.png" ),
+        srcData: require('fs').readFileSync( "./test/test.quantizeColors.png" ),
         colors: 1
     });
 
@@ -383,7 +383,7 @@ test( 'quantizeColors results, 1 color', function (t) {
 
 test( 'quantizeColors results, 5 colors', function (t) {
     var results = imagemagick.quantizeColors({
-        srcData: require('fs').readFileSync( "test.quantizeColors.png" )
+        srcData: require('fs').readFileSync( "./test/test.quantizeColors.png" )
     });
 
     t.equal( results[0].r, 255, 'results[0] red is 255' );
@@ -431,7 +431,7 @@ test( 'composite srcData is a Buffer', function (t) {
     var buffer;
     try {
         buffer = imagemagick.composite({
-            srcData: require('fs').readFileSync( "test.png", 'binary' )
+            srcData: require('fs').readFileSync( "./test/test.png", 'binary' )
         });
     } catch (e) {
         t.equal( e.message, "composite()'s 1st argument should have \"srcData\" key with a Buffer instance" );
@@ -444,8 +444,8 @@ test( 'composite compositeData is a Buffer', function (t) {
     var buffer;
     try {
         buffer = imagemagick.composite({
-            srcData: require('fs').readFileSync( "test.quantizeColors.png" ),
-            compositeData: require('fs').readFileSync("test.png","binary")
+            srcData: require('fs').readFileSync( "./test/test.quantizeColors.png" ),
+            compositeData: require('fs').readFileSync("./test/test.png","binary")
         });
     } catch (e) {
         t.equal( e.message, "composite()'s 1st argument should have \"compositeData\" key with a Buffer instance" );
@@ -456,8 +456,8 @@ test( 'composite compositeData is a Buffer', function (t) {
 
 test( 'composite image not source image',function(t) {
 
-	var srcData = require('fs').readFileSync( "test.quantizeColors.png" );
-	var compositeData = require('fs').readFileSync( "test.png" );
+	var srcData = require('fs').readFileSync( "./test/test.quantizeColors.png" );
+	var compositeData = require('fs').readFileSync( "./test/test.png" );
 
     var buffer = imagemagick.composite({
             srcData: srcData,
@@ -470,7 +470,7 @@ test( 'composite image not source image',function(t) {
 });
 
 test( 'get pixel colors: pixel colors from each 6x6 square', function(t) {
-    var srcData = require('fs').readFileSync("test.getPixelColor.png");
+    var srcData = require('fs').readFileSync("./test/test.getPixelColor.png");
 
     var targetInfo = {
         srcData : srcData,
