@@ -29,7 +29,7 @@ Table of contents
     * [Linux / Mac OS X](#installation-unix)
     * [Windows](#installation-windows)
   * [Performance](#performance)
-  * [License](#license)
+  * [License](#license) 
 
 <a name='examples'></a>
 
