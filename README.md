@@ -8,7 +8,7 @@ Features
   * Async, sync, and stream API
   * Support for `convert`, `identify`, `composite`, and other utility functions
 
-[![Build Status](https://travis-ci.org/mash/node-imagemagick-native.png)](https://travis-ci.org/mash/node-imagemagick-native)
+[![Build Status](https://travis-ci.org/elad/node-imagemagick-native.png)](https://travis-ci.org/elad/node-imagemagick-native)
 
 Table of contents
 
@@ -29,7 +29,8 @@ Table of contents
     * [Linux / Mac OS X](#installation-unix)
     * [Windows](#installation-windows)
   * [Performance](#performance)
-  * [License](#license) 
+  * [Contributing](#contributing)
+  * [License](#license)
 
 <a name='examples'></a>
 
@@ -432,6 +433,12 @@ Then:
 See `node test/benchmark.js` for details.
 
 **Note:** `node-imagemagick-native`'s primary advantage is that it uses ImageMagick's API directly rather than by executing one of its command line tools. This means that it will be much faster when the amount of time spent inside the library is small and less so otherwise. See [issue #46](https://github.com/mash/node-imagemagick-native/issues/46) for discussion.
+
+<a name='contributing'></a>
+
+## Contributing
+
+This project follows the ["OPEN Open Source"](https://gist.github.com/substack/e205f5389890a1425233) philosophy. If you submit a pull request and it gets merged you will most likely be given commit access to this repository.
 
 <a name='license'></a>
 
