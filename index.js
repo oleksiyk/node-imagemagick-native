@@ -87,7 +87,7 @@ module.exports.image = function image(srcData) {
     }
   }
 
-  for (let key of Object.keys(commandIds)) {
+  for (var key of Object.keys(commandIds)) {
     obj[key] = function(options) {
       this.cmds.push({ id: commandIds[key], options });
       return obj;
