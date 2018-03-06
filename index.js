@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = require(__dirname + '/build/Release/imagemagick.node');
 
 // Idea for stream conversions from
@@ -87,7 +89,7 @@ module.exports.image = function image(srcData) {
     }
   }
 
-  for (var key of Object.keys(commandIds)) {
+  for (let key of Object.keys(commandIds)) {
     obj[key] = function(options) {
       this.cmds.push({ id: commandIds[key], options });
       return obj;
