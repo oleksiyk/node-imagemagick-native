@@ -98,6 +98,8 @@ struct convert_im_ctx : im_ctx_base {
     int density;
     int flip;
 
+    std::vector<ImCommandWrapper*> cmds;
+
     convert_im_ctx() {}
 };
 // Extra context for composite
@@ -195,6 +197,8 @@ void autoOrient(Magick::Image *image) {
     // Erase orientation metadata after rotating the image to avoid double-rotation
     image->orientation(Magick::OrientationType::UndefinedOrientation);
 }
+
+#include "commands.h"
 
 void DoConvert(uv_work_t* req) {
 
@@ -592,6 +596,8 @@ void GeneratedBlobAfter(uv_work_t* req) {
 #endif
     }
 }
+
+#include "pipeline.h"
 
 // input
 //   info[ 0 ]: options. required, object with following key,values
@@ -1224,6 +1230,7 @@ NAN_METHOD(GetQuantumDepth) {
 }
 
 void init(Handle<Object> exports) {
+    Nan::SetMethod(exports, "pipeline", Pipeline);
     Nan::SetMethod(exports, "convert", Convert);
     Nan::SetMethod(exports, "identify", Identify);
     Nan::SetMethod(exports, "quantizeColors", QuantizeColors);

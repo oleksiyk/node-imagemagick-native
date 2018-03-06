@@ -56,3 +56,43 @@ module.exports.promises = {
   identify: promisify(module.exports.identify),
   composite: promisify(module.exports.composite),
 };
+
+var commandIds = require('./pipeline').commands;
+
+module.exports.image = function image(srcData) {
+  var obj = {
+    srcData: srcData,
+    debug: true,
+    cmds: [],
+    sourceFormat: function sourceFormat(fmt) {
+      this.srcFormat = fmt;
+      return this;
+    },
+    outFormat: function outFormat(fmt) {
+      this.format = fmt;
+      return this;
+    },
+    exec: function exec(callback) {
+      if (!callback) {
+        return new Promise(function (resolve, reject) {
+          module.exports.pipeline(this, function (err, buff) {
+            if (err) {
+              return reject(err);
+            }
+            resolve(buff);
+          });
+        });
+      }
+      module.exports.pipeline(this, callback);
+    }
+  }
+
+  for (let key of Object.keys(commandIds)) {
+    obj[key] = function(options) {
+      this.cmds.push({ id: commandIds[key], options });
+      return obj;
+    }
+  }
+
+  return obj;
+};
