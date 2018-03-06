@@ -288,7 +288,25 @@ void DoConvert(uv_work_t* req) {
 
     if( ! context->format.empty() ){
         if (debug) printf( "format: %s\n", context->format.c_str() );
-        image.magick( context->format.c_str() );
+        try {
+            image.magick( context->format.c_str() );
+        }
+        catch (Magick::Warning& warning) {
+            if (!context->ignoreWarnings) {
+                context->error = warning.what();
+                return;
+            } else if (context->debug) {
+                printf("warning: %s\n", warning.what());
+            }
+        }
+        catch (std::exception& err) {
+            context->error = err.what();
+            return;
+        }
+        catch (...) {
+            context->error = std::string("unhandled error");
+            return;
+        }
     }
 
     #if MagickLibVersion < 0x700
@@ -465,7 +483,6 @@ void DoConvert(uv_work_t* req) {
             #else
             Magick::Geometry cropGeometry( width, height, xoffset, yoffset );
             #endif
-             // Magick::Geometry cropGeometry( width, height, xoffset, yoffset, 0, 0 );
 
              Magick::Color transparent( "transparent" );
              if ( strcmp( context->format.c_str(), "PNG" ) == 0 ) {
@@ -943,10 +960,12 @@ NAN_METHOD(GetConstPixels) {
         pixel = pixels[ i ];
         Local<Object> color = Nan::New<Object>();
 
-        // color->Set(Nan::New<String>("red").ToLocalChecked(),     Nan::New<Integer>(pixel.red));
-        // color->Set(Nan::New<String>("green").ToLocalChecked(),   Nan::New<Integer>(pixel.green));
-        // color->Set(Nan::New<String>("blue").ToLocalChecked(),    Nan::New<Integer>(pixel.blue));
-        // color->Set(Nan::New<String>("opacity").ToLocalChecked(), Nan::New<Integer>(pixel.opacity));
+        #if MagickLibVersion < 0x700
+        color->Set(Nan::New<String>("red").ToLocalChecked(),     Nan::New<Integer>(pixel.red));
+        color->Set(Nan::New<String>("green").ToLocalChecked(),   Nan::New<Integer>(pixel.green));
+        color->Set(Nan::New<String>("blue").ToLocalChecked(),    Nan::New<Integer>(pixel.blue));
+        color->Set(Nan::New<String>("opacity").ToLocalChecked(), Nan::New<Integer>(pixel.opacity));
+        #endif
 
         out->Set(i, color);
     }
@@ -1021,54 +1040,58 @@ NAN_METHOD(QuantizeColors) {
 
     if (debug) printf("totalColors after: %d\n", (int) image.totalColors());
 
-    // Magick::PixelPacket* pixels = image.getPixels(0, 0, image.columns(), image.rows());
+    #if MagickLibVersion < 0x700
+    Magick::PixelPacket* pixels = image.getPixels(0, 0, image.columns(), image.rows());
 
-    // Magick::PixelPacket* colors = new Magick::PixelPacket[colorsCount]();
-    // int index = 0;
+    Magick::PixelPacket* colors = new Magick::PixelPacket[colorsCount]();
+    int index = 0;
 
-    // for ( ssize_t x = 0; x < rows ; x++ ) {
-    //     for ( ssize_t y = 0; y < columns ; y++ ) {
-    //         Magick::PixelPacket pixel = pixels[rows * x + y];
+    for ( ssize_t x = 0; x < rows ; x++ ) {
+        for ( ssize_t y = 0; y < columns ; y++ ) {
+            Magick::PixelPacket pixel = pixels[rows * x + y];
 
-    //         bool found = false;
-    //         for(int x = 0; x < colorsCount; x++)
-    //             if (pixel.red == colors[x].red && pixel.green == colors[x].green && pixel.blue == colors[x].blue) found = true;
+            bool found = false;
+            for(int x = 0; x < colorsCount; x++)
+                if (pixel.red == colors[x].red && pixel.green == colors[x].green && pixel.blue == colors[x].blue) found = true;
 
-    //         if (!found) colors[index++] = pixel;
-    //         if (index >= colorsCount) break;
-    //     }
-    //     if (index >= colorsCount) break;
-    // }
+            if (!found) colors[index++] = pixel;
+            if (index >= colorsCount) break;
+        }
+        if (index >= colorsCount) break;
+    }
+    #endif
 
     Local<Object> out = Nan::New<Array>();
 
-    // for(int x = 0; x < colorsCount; x++)
-    //     if (debug) printf("found rgb : %d %d %d\n", ((int) colors[x].red) / 255, ((int) colors[x].green) / 255, ((int) colors[x].blue) / 255);
+    #if MagickLibVersion < 0x700
+    for(int x = 0; x < colorsCount; x++)
+        if (debug) printf("found rgb : %d %d %d\n", ((int) colors[x].red) / 255, ((int) colors[x].green) / 255, ((int) colors[x].blue) / 255);
 
-    // for(int x = 0; x < colorsCount; x++) {
-    //     Local<Object> color = Nan::New<Object>();
+    for(int x = 0; x < colorsCount; x++) {
+        Local<Object> color = Nan::New<Object>();
 
-    //     int r = ((int) colors[x].red) / 255;
-    //     if (r > 255) r = 255;
+        int r = ((int) colors[x].red) / 255;
+        if (r > 255) r = 255;
 
-    //     int g = ((int) colors[x].green) / 255;
-    //     if (g > 255) g = 255;
+        int g = ((int) colors[x].green) / 255;
+        if (g > 255) g = 255;
 
-    //     int b = ((int) colors[x].blue) / 255;
-    //     if (b > 255) b = 255;
+        int b = ((int) colors[x].blue) / 255;
+        if (b > 255) b = 255;
 
-    //     color->Set(Nan::New<String>("r").ToLocalChecked(), Nan::New<Integer>(r));
-    //     color->Set(Nan::New<String>("g").ToLocalChecked(), Nan::New<Integer>(g));
-    //     color->Set(Nan::New<String>("b").ToLocalChecked(), Nan::New<Integer>(b));
+        color->Set(Nan::New<String>("r").ToLocalChecked(), Nan::New<Integer>(r));
+        color->Set(Nan::New<String>("g").ToLocalChecked(), Nan::New<Integer>(g));
+        color->Set(Nan::New<String>("b").ToLocalChecked(), Nan::New<Integer>(b));
 
-    //     char hexcol[16];
-    //     snprintf(hexcol, sizeof hexcol, "%02x%02x%02x", r, g, b);
-    //     color->Set(Nan::New<String>("hex").ToLocalChecked(), Nan::New<String>(hexcol).ToLocalChecked());
+        char hexcol[16];
+        snprintf(hexcol, sizeof hexcol, "%02x%02x%02x", r, g, b);
+        color->Set(Nan::New<String>("hex").ToLocalChecked(), Nan::New<String>(hexcol).ToLocalChecked());
 
-    //     out->Set(x, color);
-    // }
+        out->Set(x, color);
+    }
 
-    // delete[] colors;
+    delete[] colors;
+    #endif
 
     info.GetReturnValue().Set(out);
 }
