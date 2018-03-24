@@ -295,7 +295,7 @@ void DoConvert(uv_work_t* req) {
         ssize_t option_info = MagickCore::ParseCommandOption(MagickCore::MagickFilterOptions, Magick::MagickFalse, filter);
         if (option_info != -1) {
             if (debug) printf( "filter: %s\n", filter );
-            image.filterType( (Magick::FilterTypes)option_info );
+            image.filterType( (MagickCore::FilterType)option_info );
         }
         else {
             context->error = std::string("filter not supported");
@@ -360,7 +360,7 @@ void DoConvert(uv_work_t* req) {
             }
 
             if (debug) printf( "resize to: %d, %d\n", resizewidth, resizeheight );
-            Magick::Geometry resizeGeometry( resizewidth, resizeheight, 0, 0, 0, 0 );
+            Magick::Geometry resizeGeometry( resizewidth, resizeheight, 0, 0 );
             try {
                 image.zoom( resizeGeometry );
             }
@@ -378,13 +378,13 @@ void DoConvert(uv_work_t* req) {
             if ( strcmp ( gravity, "None" ) != 0 ) {
                 // limit canvas size to cropGeometry
                 if (debug) printf( "crop to: %d, %d, %d, %d\n", width, height, xoffset, yoffset );
-                Magick::Geometry cropGeometry( width, height, xoffset, yoffset, 0, 0 );
+                Magick::Geometry cropGeometry( width, height, xoffset, yoffset );
 
                 Magick::Color transparent( "transparent" );
                 if ( strcmp( context->format.c_str(), "PNG" ) == 0 ) {
                     // make background transparent for PNG
                     // JPEG background becomes black if set transparent here
-                    transparent.alpha( 1. );
+                    transparent.quantumAlpha( QuantumRange );
                 }
 
                 #if MagickLibVersion > 0x654
@@ -444,13 +444,13 @@ void DoConvert(uv_work_t* req) {
 
              // limit canvas size to cropGeometry
              if (debug) printf( "crop to: %d, %d, %d, %d\n", width, height, xoffset, yoffset );
-             Magick::Geometry cropGeometry( width, height, xoffset, yoffset, 0, 0 );
+             Magick::Geometry cropGeometry( width, height, xoffset, yoffset );
 
              Magick::Color transparent( "transparent" );
              if ( strcmp( context->format.c_str(), "PNG" ) == 0 ) {
                  // make background transparent for PNG
                  // JPEG background becomes black if set transparent here
-                 transparent.alpha( 1. );
+                 transparent.quantumAlpha( QuantumRange );
              }
 
              #if MagickLibVersion > 0x654
@@ -489,7 +489,7 @@ void DoConvert(uv_work_t* req) {
     }
 
     if (context->density) {
-        image.density(Magick::Geometry(context->density, context->density));
+        image.density(Magick::Point(context->density, context->density));
     }
 
     if( context->colorspace != Magick::UndefinedColorspace ){
@@ -729,9 +729,9 @@ void BuildIdentifyResult(uv_work_t *req, Local<Value> *argv) {
         out->Set(Nan::New<String>("colorspace").ToLocalChecked(), Nan::New<String>(MagickCore::CommandOptionToMnemonic(MagickCore::MagickColorspaceOptions, static_cast<ssize_t>(context->image.colorSpace()))).ToLocalChecked());
 
         Local<Object> out_density = Nan::New<Object>();
-        Magick::Geometry density = context->image.density();
-        out_density->Set(Nan::New<String>("width").ToLocalChecked(), Nan::New<Integer>(static_cast<int>(density.width())));
-        out_density->Set(Nan::New<String>("height").ToLocalChecked(), Nan::New<Integer>(static_cast<int>(density.height())));
+        Magick::Point density = context->image.density();
+        out_density->Set(Nan::New<String>("width").ToLocalChecked(), Nan::New<Integer>(static_cast<int>(density.x())));
+        out_density->Set(Nan::New<String>("height").ToLocalChecked(), Nan::New<Integer>(static_cast<int>(density.y())));
         out->Set(Nan::New<String>("density").ToLocalChecked(), out_density);
 
         Local<Object> out_exif = Nan::New<Object>();
@@ -886,20 +886,21 @@ NAN_METHOD(GetConstPixels) {
         return Nan::ThrowError("x/y/columns/rows values are beyond the image\'s dimensions");
     }
 
-    const Magick::PixelPacket *pixels = image.getConstPixels(xValue, yValue, columnsValue, rowsValue);
+    const Magick::Quantum *pixels = image.getConstPixels(xValue, yValue, columnsValue, rowsValue);
 
     Local<Object> out = Nan::New<Array>();
-    for (unsigned int i=0; i<columnsValue * rowsValue; i++) {
-        Magick::PixelPacket pixel = pixels[ i ];
+    /*for (unsigned int i=0; i<columnsValue * rowsValue; i++) {
+        Magick::PixelInfo packet;
+        MagickCore::GetPixelInfoPixel(image.constImage(), pixels[ i ], &packet);
         Local<Object> color = Nan::New<Object>();
 
-        color->Set(Nan::New<String>("red").ToLocalChecked(),     Nan::New<Integer>(pixel.red));
-        color->Set(Nan::New<String>("green").ToLocalChecked(),   Nan::New<Integer>(pixel.green));
-        color->Set(Nan::New<String>("blue").ToLocalChecked(),    Nan::New<Integer>(pixel.blue));
-        color->Set(Nan::New<String>("opacity").ToLocalChecked(), Nan::New<Integer>(pixel.opacity));
+        color->Set(Nan::New<String>("red").ToLocalChecked(),     Nan::New<Integer>(packet.red));
+        color->Set(Nan::New<String>("green").ToLocalChecked(),   Nan::New<Integer>(packet.green));
+        color->Set(Nan::New<String>("blue").ToLocalChecked(),    Nan::New<Integer>(packet.blue));
+        color->Set(Nan::New<String>("opacity").ToLocalChecked(), Nan::New<Integer>(packet.opacity));
 
         out->Set(i, color);
-    }
+    }*/
 
     info.GetReturnValue().Set(out);
 }
@@ -957,7 +958,7 @@ NAN_METHOD(QuantizeColors) {
     ssize_t rows = 196; ssize_t columns = 196;
 
     if (debug) printf( "resize to: %d, %d\n", (int) rows, (int) columns );
-    Magick::Geometry resizeGeometry( rows, columns, 0, 0, 0, 0 );
+    Magick::Geometry resizeGeometry( rows, columns, 0, 0 );
     image.zoom( resizeGeometry );
 
     if (debug) printf("totalColors before: %d\n", (int) image.totalColors());
@@ -967,14 +968,14 @@ NAN_METHOD(QuantizeColors) {
 
     if (debug) printf("totalColors after: %d\n", (int) image.totalColors());
 
-    Magick::PixelPacket* pixels = image.getPixels(0, 0, image.columns(), image.rows());
+    Magick::Quantum* pixels = image.getPixels(0, 0, image.columns(), image.rows());
 
-    Magick::PixelPacket* colors = new Magick::PixelPacket[colorsCount]();
+    MagickCore::PixelPacket* colors = new MagickCore::PixelPacket[colorsCount]();
     int index = 0;
 
-    for ( ssize_t x = 0; x < rows ; x++ ) {
+    /*for ( ssize_t x = 0; x < rows ; x++ ) {
         for ( ssize_t y = 0; y < columns ; y++ ) {
-            Magick::PixelPacket pixel = pixels[rows * x + y];
+            MagickCore::PixelPacket pixel = pixels[rows * x + y];
 
             bool found = false;
             for(int x = 0; x < colorsCount; x++)
@@ -984,7 +985,7 @@ NAN_METHOD(QuantizeColors) {
             if (index >= colorsCount) break;
         }
         if (index >= colorsCount) break;
-    }
+    }*/
 
     Local<Object> out = Nan::New<Array>();
 

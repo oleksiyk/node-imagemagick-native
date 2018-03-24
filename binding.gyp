@@ -47,10 +47,10 @@
           'xcode_settings': {
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
             'OTHER_CFLAGS': [
-              '<!@(pkg-config --cflags ImageMagick++)'
+              '<!@(pkg-config --cflags Magick++)'
             ],
             'OTHER_CPLUSPLUSFLAGS' : [
-              '<!@(pkg-config --cflags ImageMagick++)',
+              '<!@(pkg-config --cflags Magick++)',
               '-std=c++11',
               '-stdlib=libc++',
             ],
@@ -58,32 +58,32 @@
             'MACOSX_DEPLOYMENT_TARGET': '10.7', # -mmacosx-version-min=10.7
           },
           "libraries": [
-             '<!@(pkg-config --libs ImageMagick++)',
+             '<!@(pkg-config --libs Magick++)',
           ],
           'cflags': [
-            '<!@(pkg-config --cflags ImageMagick++)'
+            '<!@(pkg-config --cflags Magick++)'
           ],
         }],
         ['OS=="mac"', {
           'xcode_settings': {
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
             'OTHER_CFLAGS': [
-              '<!@(pkg-config --cflags ImageMagick++)'
+              '<!@(pkg-config --cflags Magick++)'
             ]
           },
           "libraries": [
-             '<!@(pkg-config --libs ImageMagick++)',
+             '<!@(pkg-config --libs Magick++)',
           ],
           'cflags': [
-            '<!@(pkg-config --cflags ImageMagick++)'
+            '<!@(pkg-config --cflags Magick++)'
           ],
         }],
         ['OS=="linux" or OS=="solaris" or OS=="freebsd"', { # not windows not mac
           "libraries": [
-            '<!@(pkg-config --libs ImageMagick++)',
+            '<!@(pkg-config --libs Magick++)',
           ],
           'cflags': [
-            '<!@(pkg-config --cflags ImageMagick++)'
+            '<!@(pkg-config --cflags Magick++)'
           ],
         }]
       ]
